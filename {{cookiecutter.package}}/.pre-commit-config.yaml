@@ -32,8 +32,6 @@ repos:
         name: "Check python using mypy"
         additional_dependencies:
           - "types-requests"
-          - "sqlalchemy2-stubs"
-          - "sqlalchemy"
   - repo: "https://github.com/timothycrosley/isort"
     rev: "5.9.3"
     hooks:
