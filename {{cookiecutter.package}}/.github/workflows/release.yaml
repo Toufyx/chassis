@@ -56,26 +56,6 @@ jobs:
   integration-tests:
     needs: [lint]
     runs-on: ubuntu-latest
-    env:
-      POSTGRES_USERNAME: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DATABASE: test
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
-    services:
-      postgres:
-        image: postgres:14.2
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -113,11 +93,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, unit-tests, integration-tests]
     env:
-      POSTGRES_USERNAME: test
-      POSTGRES_PASSWORD: test
-      POSTGRES_DATABASE: test
-      POSTGRES_HOST: localhost
-      POSTGRES_PORT: 5432
       TESTED_HOST: localhost
       TESTED_PORT: 8000
     services:
@@ -128,26 +103,8 @@ jobs:
           password: ${{ '{{' }} secrets.REGISTRY_PASSWORD {{ '}}' }}
         env:
           VERSION: ${{ '{{' }} github.sha {{ '}}' }}
-          POSTGRES_USERNAME: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DATABASE: test
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
         ports:
           - 8000:8000
-      postgres:
-        image: postgres:14.2
-        env:
-          POSTGRES_USER: test
-          POSTGRES_PASSWORD: test
-          POSTGRES_DB: test
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5432:5432
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -166,8 +123,6 @@ jobs:
           key: poetry-${{ '{{' }} hashFiles('**/poetry.lock') {{ '}}' }}
       - name: Install dependencies
         run: make init
-      - name: Setup database
-        run: make database-upgrade
       - name: Run component testing
         run: make tests-component
   contract-tests:
@@ -227,8 +182,6 @@ jobs:
           key: poetry-${{ '{{' }} hashFiles('**/poetry.lock') {{ '}}' }}
       - name: Install dependencies
         run: make init
-      - name: Setup database
-        run: make database-upgrade
       - name: Run contract testing
         run: make tests-contract
   release:
